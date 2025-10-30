@@ -882,12 +882,15 @@ client.on('interactionCreate', async interaction => {
 
 try {
   if (commandName === 'transcribe') {
-    await interaction.reply(`> ${entries_to_discord(any_text_to_entries(text))}`);
+    const text = interaction.options.getString('text');
+    const transcribed = entries_to_discord(any_text_to_entries(text));
+    await interaction.reply(`**Input:** ${text}\n**Transcribed:** ${transcribed}`);
   }
 
   else if (commandName === 'number') {
-    const ping = client.ws.ping;
-    await interaction.reply(`> ${number}: ${numberToDraconic(number)}`);
+    const number = interaction.options.getInteger('number');
+    const draconic = numberToDraconic(number);
+    await interaction.reply(`**Number:** ${number}\n**Draconic:** ${draconic}`);
   }
 } catch (error) {
   console.error('Err:', error);
