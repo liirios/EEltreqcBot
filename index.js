@@ -4,22 +4,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Client, Collection, Events, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { DIALECTS } from "https://draconicconlang.github.io/APIs/dialects/DialectLoader.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function main() {
-  const res = await fetch("https://draconicconlang.github.io/APIs/dialects/DialectLoader.js");
-  const loaderCode = await res.text();
-  const getDIALECTS = new Function(`
-    ${loaderCode}
-    return DIALECTS;
-  `);
-
-  const DIALECTS = getDIALECTS();
-  const DR = await DIALECTS.load("dr_dr");
-  Object.assign(globalThis, DR);
-
   function replaceLetterDiscord(newDiscordList) {
     const chars = Object.values(CHARACTERS.MAP);
     for (let i = 0; i < chars.length; i++) {
@@ -40,7 +30,11 @@ async function main() {
     "     " // SPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACE
   ];
 
+  const DR = await DIALECTS.load("dr_dr");
+  Object.assign(globalThis, DR);
+
   replaceLetterDiscord(newDiscords);
+  
 
   const client = new Client({ intents: [GatewayIntentBits.Guilds] });
   client.commands = new Collection();
