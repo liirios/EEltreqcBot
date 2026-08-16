@@ -1,0 +1,8 @@
+{
+    "ping": "rawr :3",
+    "error": "Something went wrong running this command, please contact developer.",
+    "error.limited.fetch": "On this server, only trusted users can request more than {i} results to prevent flood. Alternatively, enable quiet = True.",
+    "error.value_is_nan": "> `{value}` is NaN",
+    "fetch.result": "> {word} - {type} - {def}.",
+    "random_word.result": "> {word} - {type} - {def}"
+}
