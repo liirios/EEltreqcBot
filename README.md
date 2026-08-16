@@ -1,8 +1,8 @@
 # Ēltreqc
-A discord bot made by LiroxDeYamon for quick and easy way to use [DraconicAPIs](https://github.com/DraconicConlang/APIs)' tools.
+A discord bot made by Liirios for quick and easy way to use [DraconicAPIs](https://github.com/DraconicConlang/APIs)' tools.
 
 ## License
-© 2026 LiroxDeYamon  
+© 2026 Liirios  
 Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 This project includes usage of *The Draconic Language*, which is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).  

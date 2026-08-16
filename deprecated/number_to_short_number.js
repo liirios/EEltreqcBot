@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   data: {
     name: "number_to_short_number",
     description: "Converts number to Draconic short number text",
@@ -9,7 +9,8 @@ module.exports = {
     "integration_types": [0, 1],
     "contexts": [0, 1, 2]
   },
+  minPerm: 1,
   async execute(interaction) {
-    await interaction.reply({ content: `> ${NUMBERS.numberToTextShort(interaction.options.getInteger('number'))}`, flags: interaction.options.getBoolean('quiet') ?? false ? MessageFlags.Ephemeral : undefined }).catch(console.error);
+    await interaction.reply({ content: `> ${NUMBERS.numberToTextShort(interaction.options.getInteger("number"))}`, flags: interaction.options.getBoolean("quiet") ?? false ? MessageFlags.Ephemeral : undefined }).catch(console.error);
   }
 }
