@@ -1,10 +1,19 @@
 {
   "dependencies": {
     "better-sqlite3": "^13.0.3",
+    "canvas": "^3.2.3",
     "discord.js": "^14.24.2",
     "dotenv": "^17.2.3",
     "fs": "^0.0.1-security",
+    "liquidjs": "^10.29.0",
     "node-fetch": "^3.3.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "pet-pet-gif": "^1.0.9",
+    "winston": "^3.19.0"
+  },
+  "allowScripts": {
+    "canvas@3.2.3": true,
+    "canvas@2.11.2": true,
+    "better-sqlite3@13.0.3": true
   }
 }

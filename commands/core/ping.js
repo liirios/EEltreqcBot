@@ -1,8 +1,8 @@
-import { getLocale } from "../locales.js";
+import { InteractionResponse } from "../../enum.js";
+import { getLocale } from "../../locales.js";
 
 export default {
   data: {
-    name: "ping",
     description: "pong",
     options: [{ name: "quiet", description: "Ephemeral", type: 5 }],
     integration_types: [0, 1],
@@ -19,5 +19,6 @@ export default {
     await interaction.editReply(
       `${text}\n-# uptime: ${Math.round(interaction.client.uptime / 3600000)}^h | api.ping: ${interaction.client.ws.ping}^ms | bot.ping: ${sent.createdTimestamp - interaction.createdTimestamp}^ms`
     );
+    return InteractionResponse.OK;
   }
 };

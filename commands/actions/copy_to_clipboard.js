@@ -1,4 +1,5 @@
-import { setClipboard } from "../clipboard.js";
+import { setClipboard } from "../../clipboard.js";
+import { InteractionResponse } from "../../enum.js";
 
 export default {
   data: {
@@ -11,12 +12,11 @@ export default {
   async execute(interaction) {
     const message = interaction.targetMessage;
 
-    if (!message.content) {
-      return interaction.reply({ content: `> empty message.`, flags: 64 });
-    }
+    if (!message.content) return interaction.reply({ content: `> empty message.`, flags: 64 });
 
     setClipboard(interaction.user.id, message.author.id, message.content);
 
     await interaction.reply({ content: `> copied.`, flags: 64 });
+    return InteractionResponse.OK;
   }
 };
