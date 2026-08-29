@@ -1,8 +1,34 @@
 {
     "ping": "rawr :3",
     "error": "Something went wrong running this command, please contact developer.",
-    "error.limited.fetch": "On this server, only trusted users can request more than {i} results to prevent flood. Alternatively, enable quiet = True.",
-    "error.value_is_nan": "> `{value}` is NaN",
-    "fetch.result": "> {word} - {type} - {def}.",
-    "random_word.result": "> {word} - {type} - {def}"
+    "error.unimplemented": "This feature is not implemented yet.",
+    "error.value_is_nan": "> `{{value}}` is NaN",
+    
+    "word.fetch.result": "Fetch^`{{query}}`:\n{{results}}",
+    "word.fetch.entry": "> {{word}} - {{type}} - {{def}}.",
+    "word.fetch.limited": "On this server, only trusted users can request more than {{i}} results to prevent flood. Alternatively, enable quiet = True.",
+    "word.conjugate.result": "> {{text}}",
+    "word.random.result": "> {{word}} - {{type}} - {{def}}.",
+
+    "convert.text.result": "> {{value}}",
+    "convert.number.result": "> {{value}}",
+
+    "locale.get.result": "Locale^`{{key}}`: `\"{{value}}\"`",
+    "locale.set.result": "Locale^`{{key}}` updated: `\"{{value}}\"`",
+    "locale.reset.result": "Locale^`{{key}}` reset: `\"{{value}}\"`",
+    "locale.add.result": "Locale^`{{key}}` added: `\"{{value}}\"`",
+    "locale.actialize.result": "Locale^`{{key}}` actialized",
+    "locale.sync.result": "Locales synced with default json",
+
+    "user.get.result": "User^`{{target}}` id^{{id}}: perm^{{perm}} ({{perm_name}}), title `{{title}}`",
+    "user.set.result": "User^`{{target}}` id^{{id}} updated: perm^{{perm}} ({{perm_name}}), title `{{title}}`",
+
+    "faq.get.result": "FAQ^`{{name}}` - {{author}}:\n{{text}}",
+    "faq.add.result": "FAQ^`{{name}}` added",
+    "faq.add.exists": "FAQ^`{{name}}` is not absent",
+    "faq.remove.result": "FAQ^`{{name}}` removed",
+    
+    "petpet.result": "{{executor}} pet {{target}} {{ \":3|>:3|^w^\" | random }}",
+    "meow.result": "> {{ \"meow|mrow|mraw|mreow|mreaw|mrrrrp|purr|mao|maaooo|prrrrrr\" | random }}",
+    "pointandlaugh.result": "{{text}}"
 }

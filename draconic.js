@@ -1,18 +1,20 @@
+import { info } from "./logger.js";
+
 export async function loadDialects() {
-    console.log("Loading DraconicAPIs");
+    info("Loading DraconicAPIs DialectLoader");
     const res = await fetch("https://draconicconlang.github.io/APIs/dialects/DialectLoader.js");
     const src = await res.text();
     const mod = await import(`data:text/javascript,${encodeURIComponent(src)}`);
-    console.log("Loaded DraconicAPIs");
+    info("Loaded DraconicAPIs DialectLoader");
     return mod.DIALECTS;
 }
 
 export async function loadDialect(dialect) {
     const DIALECTS = await loadDialects();
-    console.log(`Loading dialect^${dialect}`)
+    info(`Loading dialect^${dialect}`)
     const DR = await DIALECTS.load(dialect);
     Object.assign(globalThis, DR);
-    console.log(`Loaded dialect^${dialect}`)
+    info(`Loaded dialect^${dialect}`)
 }
 
 export const newDiscords = [
