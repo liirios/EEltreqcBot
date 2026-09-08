@@ -3,6 +3,7 @@ import { AttachmentBuilder, EmbedBuilder } from "discord.js";
 import { getFormatted } from "../../locales.js";
 import { getUser } from "../../db.js";
 import { formatUser } from "../../utils.js"
+import { InteractionResponse } from "../../enum.js";
 
 export default {
   data: {
@@ -34,5 +35,6 @@ export default {
       .setImage("attachment://pet.gif").setColor(member?.displayColor || null);
 
     await interaction.editReply({ embeds: [embed], files: [attachment] });
+    return InteractionResponse.OK;
   }
 };

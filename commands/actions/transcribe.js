@@ -1,4 +1,5 @@
 import { entriesToDiscord } from "../../draconic.js";
+import { InteractionResponse } from "../../enum.js";
 
 export default {
   data: {
@@ -10,8 +11,9 @@ export default {
   async execute(interaction) {
     const message = interaction.targetMessage;
 
-    if (!message.content) return interaction.reply({ content: `> empty message.`, flags: 64 });
+    if (!message.content) return InteractionResponse.CUSTOM("empty message");
 
-    await interaction.reply({ content: `> ${entriesToDiscord(CHARACTERS.textToEntriesByAnyText(message.content))}`, flags: 64 });
+    await reply(interaction, "transcribe.result", {value: entriesToDiscord(CHARACTERS.textToEntriesByAnyText(message.content))}, true);
+    return InteractionResponse.OK;
   }
 };

@@ -13,7 +13,7 @@ export default {
     integration_types: [0, 1],
     contexts: [0, 1, 2]
   },
-  minPerm: 3,
+  minPerm: 4,
   async execute(interaction) {
     const text = interaction.options.getString("text");
     const quiet = interaction.options.getBoolean("quiet") ?? false;
@@ -29,5 +29,6 @@ export default {
     }
 
     interaction.reply({ content: result, flags: quiet ? 64 : undefined });
+
   }
 };

@@ -1,3 +1,4 @@
+import { loadCommand, loadCommandGroup, registerCommands, unloadCommand, unloadCommandGroup } from "../../bot.js";
 import { InteractionOption, InteractionResponse } from "../../enum.js";
 import { CONTEXT_TYPES, getLocale, INTEGRATION_TYPES, OPTION_TYPES, syncLocales } from "../../locales.js";
 import { getPerm, getPermName } from "../../permissions.js";
@@ -17,8 +18,8 @@ export default {
                 {
                     name: "individual", description: "Load command", type: 1,
                     options: [
-                        InteractionOption.KEY_AUTO,
                         { name: "group", description: "Group", type: 3, required: true, autocomplete: true },
+                        InteractionOption.KEY_AUTO,
                         InteractionOption.QUIET
                     ]
                 },
@@ -74,9 +75,9 @@ export default {
                         case "individual": {
                             switch (focused.name) {
                                 case "group": { entries = getCommandGroups(); break; }
-                                case "key": { entries = getCommands(group); break;
-                                }
+                                case "key": { entries = getCommands(group); break; }
                             }
+                            break;
                         }
                         case "group": { entries = getCommandGroups(); break; }
                     }
@@ -94,12 +95,12 @@ export default {
         }
 
         await interaction.respond(simpleFilter(entries, focused.value).map(name => ({ name, value: name })));
-
     },
     async execute(interaction) {
         const subgroup = interaction.options.getSubcommandGroup();
         const sub = interaction.options.getSubcommand();
         const key = interaction.options.getString("key");
+        const group = interaction.options.getString("group");
         const quiet = interaction.options.getBoolean("quiet") ?? false;
         const perm = getPerm(interaction.user.id);
 
@@ -125,43 +126,51 @@ export default {
             return InteractionResponse.OK;
         }
 
+        if (perm < 3) return InteractionResponse.NO_PERM(3);
         switch (subgroup) {
             case "load": {
-                if (perm < 3) return InteractionResponse.NO_PERM(3);
                 switch (sub) {
                     case "individual": {
-                        return InteractionResponse.UNIMPL;
+                        await loadCommand(key, group);
+                        return InteractionResponse.OK;
                     }
                     case "group": {
-                        return InteractionResponse.UNIMPL;
+                        await loadCommandGroup(key);
+                        return InteractionResponse.OK;
                     }
                 }
                 break;
             }
             case "unload": {
-                if (perm < 3) return InteractionResponse.NO_PERM(3);
                 switch (sub) {
                     case "individual": {
-                        return InteractionResponse.UNIMPL;
+                        await unloadCommand(key);
+                        return InteractionResponse.OK;
                     }
                     case "group": {
-                        return InteractionResponse.UNIMPL;
+                        await unloadCommandGroup(key);
+                        return InteractionResponse.OK;
                     }
                 }
                 break;
             }
             case "reload": {
-                if (perm < 3) return InteractionResponse.NO_PERM(3);
                 switch (sub) {
                     case "individual": {
-                        return InteractionResponse.UNIMPL;
+                        const g = interaction.client.commands.get(key).group;
+                        await unloadCommand(key);
+                        await loadCommand(key, g);
+                        return InteractionResponse.OK;
                     }
                     case "group": {
-                        return InteractionResponse.UNIMPL;
+                        await unloadCommandGroup(key);
+                        await loadCommandGroup(key);
+                        return InteractionResponse.OK;
                     }
                 }
                 break;
             }
         }
+        await registerCommands()
     }
 };
