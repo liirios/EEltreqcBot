@@ -12,7 +12,7 @@ export default {
   async execute(interaction) {
     const message = interaction.targetMessage;
 
-    if (!message.content) return interaction.reply({ content: `> empty message.`, flags: 64 });
+    if (!message.content) return InteractionResponse.CUSTOM("empty message");
 
     setClipboard(interaction.user.id, message.author.id, message.content);
 

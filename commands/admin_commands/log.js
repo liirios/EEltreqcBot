@@ -1,3 +1,4 @@
+import { InteractionResponse } from "../../enum.js";
 import { query } from "../../logger.js";
 import { crop } from "../../utils.js";
 
@@ -21,6 +22,7 @@ export default {
       content = crop(2000, content)
 
       interaction.reply({ content: content, flags: quiet ? 64 : undefined });
+      return InteractionResponse.OK;
     });
   }
 };

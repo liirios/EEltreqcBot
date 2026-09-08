@@ -10,6 +10,9 @@
     "word.conjugate.result": "> {{text}}",
     "word.random.result": "> {{word}} - {{type}} - {{def}}.",
 
+    "log.result": "Log^`{{query}}`:\n{{results}}",
+    "log.entry": "> {{timestamp}} - {{level}} - {{message}}.",
+
     "convert.text.result": "> {{value}}",
     "convert.number.result": "> {{value}}",
 

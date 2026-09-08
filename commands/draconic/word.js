@@ -1,6 +1,10 @@
 import { reply } from "../../bot.js";
 import { InteractionOption, InteractionResponse } from "../../enum.js";
+import { getFormatted } from "../../locales.js";
 import { getPerm } from "../../permissions.js";
+import { highlight } from "../../utils.js";
+
+const MAX_LIMITED_RESULTS = 7;
 
 export default {
     data: {
@@ -74,7 +78,7 @@ export default {
                 let content = entries.join("\n") || "> No results";
                 content = highlight(query, content);
 
-                await reply(interaction, "word.fetch.result", { query: query, results: content }, quiet)
+                await reply(interaction, "word.fetch.result", { query: query, results: content }, quiet);
                 return InteractionResponse.OK;
             }
             case "random": {

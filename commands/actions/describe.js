@@ -1,3 +1,6 @@
+import { reply } from "../../bot.js";
+import { InteractionResponse } from "../../enum.js";
+
 export default {
   data: {
     type: 3,
@@ -8,8 +11,9 @@ export default {
   async execute(interaction) {
     const message = interaction.targetMessage;
 
-    if (!message.content) return interaction.reply({ content: `> empty message.`, flags: 64 });
+    if (!message.content) return InteractionResponse.CUSTOM("empty message");
 
-    await interaction.reply({ content: `> ${CHARACTERS.entriesToText(CHARACTERS.textToEntriesByAnyText(message.content))}`, flags: 64 });
+    await reply(interaction, "describe.result", {value: CHARACTERS.entriesToText(CHARACTERS.textToEntriesByAnyText(message.content))}, true);
+    return InteractionResponse.OK;
   }
 };
