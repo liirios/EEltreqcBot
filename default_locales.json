@@ -17,21 +17,32 @@
     "convert.number.result": "> {{value}}",
 
     "locale.get.result": "Locale^`{{key}}`: `\"{{value}}\"`",
-    "locale.set.result": "Locale^`{{key}}` updated: `\"{{value}}\"`",
+    "locale.update.result": "Locale^`{{key}}` updated: `\"{{value}}\"`",
     "locale.reset.result": "Locale^`{{key}}` reset: `\"{{value}}\"`",
     "locale.add.result": "Locale^`{{key}}` added: `\"{{value}}\"`",
     "locale.actialize.result": "Locale^`{{key}}` actialized",
     "locale.sync.result": "Locales synced with default json",
 
-    "user.get.result": "User^`{{target}}` id^{{id}}: perm^{{perm}} ({{perm_name}}), title `{{title}}`",
-    "user.set.result": "User^`{{target}}` id^{{id}} updated: perm^{{perm}} ({{perm_name}}), title `{{title}}`",
+    "user.get.result": "User^`{{target}}` id^`{{id}}`:\n perm^{{perm}} ({{perm_name}}),\n title `{{title}}`",
+    "user.update.result": "User^`{{target}}` id^`{{id}}` updated:\n perm^{{perm}} ({{perm_name}}),\n title `{{title}}`",
 
-    "faq.get.result": "FAQ^`{{name}}` - {{author}}:\n{{text}}",
+    "faq.get.result": "FAQ^`{{name}}` @`{{timestamp}}` - {{author}}:\n{{text}}",
     "faq.add.result": "FAQ^`{{name}}` added",
     "faq.add.exists": "FAQ^`{{name}}` is not absent",
     "faq.remove.result": "FAQ^`{{name}}` removed",
-    
+    "faq.remove.locked": "FAQ^`{{name}}` is locked, cant remove",
+    "faq.lock.result": "FAQ^`{{name}}` locked",
+    "faq.lock.locked": "FAQ^`{{name}}` is already locked",
+    "faq.unlock.result": "FAQ^`{{name}}` unlocked",
+    "faq.unlock.unlocked": "FAQ^`{{name}}` is already unlocked",
+
+    "quiet.result": "Set autoquiet for {{target}} to {{boolean}}",
     "petpet.result": "{{executor}} pet {{target}} {{ \":3|>:3|^w^\" | random }}",
     "meow.result": "> {{ \"meow|mrow|mraw|mreow|mreaw|mrrrrp|purr|mao|maaooo|prrrrrr\" | random }}",
-    "pointandlaugh.result": "{{text}}"
+    "pointandlaugh.result": "{{text}}",
+    "compute.result": "{{text}}",
+    "compute.result.sent": "{{link}}",
+
+    "thy.rename.result": "Set self name: {{value}}",
+    "thy.status.result": "Set self status: {{status}}, type: {{type}}, text: {{value}}"
 }

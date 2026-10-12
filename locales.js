@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-import { Liquid } from "liquidjs";
-import { updateLocaleRow, getAllLocaleRows, syncLocaleRows } from "./db.js";
+import {fileURLToPath} from "url";
+import {Liquid} from "liquidjs";
+import {LOCALES, syncLocaleRows} from "./db/db.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export let DEFAULT_LOCALES = {};
-export let LOCALES = {};
+export let LOCALES_CURRENT = {};
 
 export const PERMISSIONS = {
     "-214748369": "1ue apparently",
@@ -63,11 +63,11 @@ export function loadDefaultLocales(locales_path) {
 
 export function syncLocales() {
     syncLocaleRows(DEFAULT_LOCALES);
-    for (const row of getAllLocaleRows()) LOCALES[row.name] = row.value;
+    for (const row of LOCALES.getAll()) LOCALES_CURRENT[row.name] = row.value;
 }
 
 export function getLocale(id) {
-    return Object.prototype.hasOwnProperty.call(LOCALES, id) ? LOCALES[id] : id;
+    return Object.prototype.hasOwnProperty.call(LOCALES_CURRENT, id) ? LOCALES_CURRENT[id] : id;
 }
 
 export async function format(string, args = {}) {
@@ -85,8 +85,8 @@ export async function getFormatted(id, args = {}) {
 }
 
 export function setLocale(name, value) {
-    updateLocaleRow(name, value);
-    LOCALES[name] = value;
+    LOCALES.update(name, {"value": value});
+    LOCALES_CURRENT[name] = value;
     return value;
 }
 
@@ -95,5 +95,5 @@ export function resetLocale(name) {
 }
 
 export function getAllLocales() {
-    return { ...LOCALES };
+    return {...LOCALES_CURRENT };
 }

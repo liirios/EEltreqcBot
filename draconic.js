@@ -1,4 +1,4 @@
-import { info } from "./logger.js";
+import {info} from "./logger.js";
 
 export async function loadDialects() {
     info("Loading DraconicAPIs DialectLoader");

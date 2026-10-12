@@ -1,8 +1,7 @@
-import { loadCommand, loadCommandGroup, registerCommands, unloadCommand, unloadCommandGroup } from "../../bot.js";
-import { InteractionOption, InteractionResponse } from "../../enum.js";
-import { CONTEXT_TYPES, getLocale, INTEGRATION_TYPES, OPTION_TYPES, syncLocales } from "../../locales.js";
-import { getPerm, getPermName } from "../../permissions.js";
-import { getCommandGroups, getCommands, simpleFilter } from "../../utils.js";
+import {Option, Result, Setting} from "../../enum.js";
+import {getCommandGroups, getCommands, loadCommand, loadCommandGroup, registerCommands, unloadCommand, unloadCommandGroup} from "../../commands.js";
+import {getPerm, getPermName} from "../../permissions.js";
+import {simpleFilter} from "../../utils.js";
 
 export default {
     data: {
@@ -10,48 +9,48 @@ export default {
         options: [
         {
             name: "get", description: "Get command data (Do not spam/flood with it)", type: 1,
-            options: [ InteractionOption.KEY_AUTO, InteractionOption.QUIET ]
+            options: [ Option.KEY_AUTO, Option.QUIET ]
         },
         {
-            name: "load", description: "Load ...", type: 2,
+            name: "load", description: "Load command", type: 2,
             options: [
                 {
                     name: "individual", description: "Load command", type: 1,
                     options: [
-                        { name: "group", description: "Group", type: 3, required: true, autocomplete: true },
-                        InteractionOption.KEY_AUTO,
-                        InteractionOption.QUIET
+                        {name: "group", description: "Group", type: 3, required: true, autocomplete: true},
+                        Option.KEY_AUTO,
+                        Option.QUIET
                     ]
                 },
                 {
                     name: "group", description: "Load command group", type: 1,
-                    options: [ InteractionOption.KEY_AUTO, InteractionOption.QUIET ]
+                    options: [ Option.KEY_AUTO, Option.QUIET ]
                 }
             ]
         },
         {
-            name: "unload", description: "Unload ...", type: 2,
+            name: "unload", description: "Unload command", type: 2,
             options: [
                 {
                     name: "individual", description: "Unload currently loaded command", type: 1,
-                    options: [ InteractionOption.KEY_AUTO, InteractionOption.QUIET ]
+                    options: [ Option.KEY_AUTO, Option.QUIET ]
                 },
                 {
                     name: "group", description: "Unload currently loaded command group", type: 1,
-                    options: [ InteractionOption.KEY_AUTO, InteractionOption.QUIET ]
+                    options: [ Option.KEY_AUTO, Option.QUIET ]
                 }
             ]
         },
         {
-            name: "reload", description: "Reload ...", type: 2,
+            name: "reload", description: "Reload command", type: 2,
             options: [
                 {
                     name: "individual", description: "Reload currently loaded command", type: 1,
-                    options: [ InteractionOption.KEY_AUTO, InteractionOption.QUIET ]
+                    options: [ Option.KEY_AUTO, Option.QUIET ]
                 },
                 {
                     name: "group", description: "Reload currently loaded command group", type: 1,
-                    options: [ InteractionOption.KEY_AUTO, InteractionOption.QUIET ]
+                    options: [ Option.KEY_AUTO, Option.QUIET ]
                 }
             ]
         }
@@ -59,7 +58,7 @@ export default {
         integration_types: [0, 1],
         contexts: [0, 1, 2]
     },
-    minPerm: 1,
+    settings: [Setting.PERM(1, false)],
     async autocomplete(interaction) {
         const subgroup = interaction.options.getSubcommandGroup();
         const sub = interaction.options.getSubcommand();
@@ -74,69 +73,50 @@ export default {
                     switch (sub) {
                         case "individual": {
                             switch (focused.name) {
-                                case "group": { entries = getCommandGroups(); break; }
-                                case "key": { entries = getCommands(group); break; }
+                                case "group": {entries = getCommandGroups(); break;}
+                                case "key": {entries = getCommands(group); break;}
                             }
                             break;
                         }
-                        case "group": { entries = getCommandGroups(); break; }
+                        case "group": {entries = getCommandGroups(); break;}
                     }
                     break;
                 }
                 case "unload":
                 case "reload": {
                     switch (sub) {
-                        case "individual": { entries = [...interaction.client.commands.keys()]; break; }
-                        case "group": { entries = [...new Set([...interaction.client.commands.values()].map(c => c.group))]; break; }
+                        case "individual": {entries = [...interaction.client.commands.keys()]; break;}
+                        case "group": {entries = [...new Set([...interaction.client.commands.values()].map(c => c.group))]; break;}
                     }
                     break;
                 }
             }
         }
 
-        await interaction.respond(simpleFilter(entries, focused.value).map(name => ({ name, value: name })));
+        await interaction.respond(simpleFilter(entries, focused.value).map(name => ({name, value: name})));
     },
     async execute(interaction) {
         const subgroup = interaction.options.getSubcommandGroup();
         const sub = interaction.options.getSubcommand();
         const key = interaction.options.getString("key");
         const group = interaction.options.getString("group");
-        const quiet = interaction.options.getBoolean("quiet") ?? false;
-        const perm = getPerm(interaction.user.id);
 
 
         if (sub == "get") {
-            const command = interaction.client.commands.get(key);
-            const minPerm = command.minPerm ?? 0;
-            const options = Array.isArray(command.data.options) ? command.data.options : [];
-            const optionLines = options.length > 0 ? options.map(opt => `> - \`${opt.name}\`: ${OPTION_TYPES[opt.type] ?? `Unknown(${opt.type})`}`).join("\n") : "> - none";
-            const integrationTypes = Array.isArray(command.data.integration_types) && command.data.integration_types.length > 0 ? command.data.integration_types.map(v => INTEGRATION_TYPES[v] ?? `Unknown(${v})`).join(", ") : "none";
-            const contexts = Array.isArray(command.data.contexts) && command.data.contexts.length > 0 ? command.data.contexts.map(v => CONTEXT_TYPES[v] ?? `Unknown(${v})`).join(", ") : "none";
-            const content = [
-                `cmd^\`/${command.data.name}\`:`,
-                `> Description: ${command.data.description}`,
-                `> Permission: perm^${minPerm} (${getPermName(minPerm)}) or higher`,
-                `> Integration types: ${integrationTypes}`,
-                `> Contexts: ${contexts}`,
-                `> Options:`,
-                optionLines
-            ].join("\n");
-        
-            await interaction.reply({ content, flags: quiet ? 64 : undefined });
-            return InteractionResponse.OK;
+            return Result.UNIMPL;
         }
 
-        if (perm < 3) return InteractionResponse.NO_PERM(3);
+        if (getPerm(interaction.user.id) < 3) return Result.NO_PERM(3, false);
         switch (subgroup) {
             case "load": {
                 switch (sub) {
                     case "individual": {
                         await loadCommand(key, group);
-                        return InteractionResponse.OK;
+                        return Result.OK;
                     }
                     case "group": {
                         await loadCommandGroup(key);
-                        return InteractionResponse.OK;
+                        return Result.OK;
                     }
                 }
                 break;
@@ -145,11 +125,11 @@ export default {
                 switch (sub) {
                     case "individual": {
                         await unloadCommand(key);
-                        return InteractionResponse.OK;
+                        return Result.OK;
                     }
                     case "group": {
                         await unloadCommandGroup(key);
-                        return InteractionResponse.OK;
+                        return Result.OK;
                     }
                 }
                 break;
@@ -160,12 +140,12 @@ export default {
                         const g = interaction.client.commands.get(key).group;
                         await unloadCommand(key);
                         await loadCommand(key, g);
-                        return InteractionResponse.OK;
+                        return Result.OK;
                     }
                     case "group": {
                         await unloadCommandGroup(key);
                         await loadCommandGroup(key);
-                        return InteractionResponse.OK;
+                        return Result.OK;
                     }
                 }
                 break;
