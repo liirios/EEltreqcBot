@@ -8,7 +8,7 @@ const LIMITED_CHANNELS = [
 
 const UNRESTRICTED_PERM = 2; // TODO: Move somewhere into db for runtime editing
 
-export function isLimited(interaction, perm) { // TODO: Add channel limiting
+export function isLimited(interaction, perm) {// TODO: Add channel limiting
     return perm => UNRESTRICTED_PERM || !(interaction.guildId === SERVER_LIMITED)
 }
 

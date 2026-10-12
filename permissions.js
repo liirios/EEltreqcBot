@@ -1,5 +1,5 @@
-import { getUser } from "./db.js";
-import { PERMISSIONS } from "./locales.js";
+import {USERS} from "./db/db.js";
+import {PERMISSIONS} from "./locales.js";
 
 export function getPermName(level) {
     if (level in PERMISSIONS) return PERMISSIONS[level];
@@ -16,5 +16,5 @@ export function getPermName(level) {
 }
 
 export function getPerm(user_id) {
-    return getUser(user_id).perm;
+    return USERS.get(user_id)?.perm ?? 1;
 }

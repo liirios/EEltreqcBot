@@ -1,17 +1,17 @@
-import { createLogger, format, transports } from "winston";
-const { combine, timestamp, colorize, printf, json } = format;
+import {createLogger, format, transports} from "winston";
+const {combine, timestamp, colorize, printf, json} = format;
 
-const logFormat = printf(({ level, message, label, timestamp }) => {
+const logFormat = printf(({level, message, label, timestamp}) => {
   return `${timestamp} - ${level}: ${message}`;
 });
 
 const logger = createLogger({
     level: "silly",
     transports: [
-        new transports.Console({ format: combine(timestamp(), colorize(), logFormat) }),
-        new transports.File({ format: combine(timestamp(), logFormat), filename: `./logs/${Date.now()}.log` }),
-        new transports.File({ format: combine(timestamp(), logFormat), filename: `./logs/full.log` }),
-        new transports.File({ format: combine(timestamp(), json()), filename: `./logs/full.json.log` })
+        new transports.Console({format: combine(timestamp(), colorize(), logFormat)}),
+        new transports.File({format: combine(timestamp(), logFormat), filename: `./logs/${Date.now()}.log`}),
+        new transports.File({format: combine(timestamp(), logFormat), filename: `./logs/full.log`}),
+        new transports.File({format: combine(timestamp(), json()), filename: `./logs/full.json.log`})
     ]
 });
 

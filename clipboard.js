@@ -1,7 +1,7 @@
 const clipboard = new Map();
 
-export function setClipboard(userId, author, content) {
-    clipboard.set(userId, { author, content });
+export function setClipboard(userId, author, content, createdAt) {
+    clipboard.set(userId, {author, content, createdAt});
 }
 
 export function getClipboard(userId) {
