@@ -1,5 +1,33 @@
-.env
+# Ignore a blackhole and the folder for development
 node_modules/
-db.db*
+.vs/
+.idea/
+*.iml
+
+# Yarn files
+.yarn/install-state.gz
+.yarn/build-state.yml
+
+# Environment variables
+.DS_Store
+
+dist/
+
+# Ignore the config file (contains sensitive information such as tokens)
+config.ts
+
+# Ignore heapsnapshot and log files
+*.heapsnapshot
 *.log
-ghign_*/
+
+# Ignore npm lockfiles file
+package-lock.json
+
+# Environment variables
+.env
+
+# database
+db.db*
+
+# 
+ghi_*/
