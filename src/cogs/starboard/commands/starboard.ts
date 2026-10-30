@@ -33,7 +33,7 @@ const WHITELIST = [
 ]
 
 @ApplyOptions<Subcommand.Options>({
-	name: "starboard", description: "starboard", aliases: ["starboards", "starsboard", "starsboards", "star", "stars"],
+	name: "starboard", description: "starboard", aliases: ["starboards", "starsboard", "starsboards", "star", "stars", "sb"],
 	options: OPTIONS,
 	subcommands: [
 		{name: "all", messageRun: "entryGetAll", default: true},
@@ -76,8 +76,8 @@ export class StarboardCommand extends Subcommand {
 				.sub("remove", "Remove a channel from the whitelist", (o) => o.integer("id", true).channel("channel", true).quiet())
 				.sub("blacklist", "Treat starboard's whitelist as blacklist", (o) => o.integer("id", true).boolean("blacklist", true).quiet()))
 			.grp("message", "Control starboard messages idk im out of description ideas", (g) => g
-				.sub("lock", "Lock (or unlock) a message in every starboard of this guild", (o) => o.integer("id", true).string("message", true).boolean("locked").quiet())
-				.sub("force", "Force a message onto a starboard regardless of stars", (o) => o.integer("id", true).string("message", true).quiet()))
+				.sub("lock", "Lock (or unlock) a message in every starboard of this guild", (o) => o.integer("id", true).string("message", false).boolean("locked").quiet())
+				.sub("force", "Force a message onto a starboard regardless of stars", (o) => o.integer("id", true).string("message", false).quiet()))
 			.builder
 		);
 	}
@@ -88,22 +88,39 @@ export class StarboardCommand extends Subcommand {
 	}
 
 	private async pickMessage(um: UniversalMessage): Promise<ResolvedMessage | null> {
-		const input = (await um.grab.pick("string", "message")).trim();
-		const link = input.match(/channels\/(\d+)\/(\d+)\/(\d+)/);
-		const [guildId, channelId, messageId] = link ? link.slice(1) : [um.guild.id, um.channel.id, /^\d{17,20}$/.test(input) ? input : undefined];
+		const input = (await um.grab.pick("string", "message", null))?.trim();
+		const ref = um.isMessage ? um.message.reference : null;
 
-		if (guildId === um.guild.id && messageId) {
-			const post = SBM.getByPost(messageId);
-			const message = await this.fetchMessage(post?.channel ?? channelId, post?.message ?? messageId);
-			if (message) return ResolvedMessage.from(message);
+		let guildId: string | undefined, channelId: string | undefined, messageId: string | undefined;
+
+		if (input) {
+			const link = input.match(/channels\/(\d+)\/(\d+)\/(\d+)/);
+			if (link) [, guildId, channelId, messageId] = link;
+			else if (/^\d{17,20}$/.test(input)) messageId = input;
+		} else if (ref?.messageId) ({guildId, channelId, messageId} = ref);
+		else {
+			await um.reply("Reply to a message or give me its id/link\n-# e.g. starboard force 3 <message link>");
+			return null;
 		}
-		await um.reply("Message not found");
-		return null;
-	}
 
-	private async fetchMessage(channelId?: string, messageId?: string) {
-		const channel = (await ResolvedChannel.from(channelId).resolve()).channel;
-		return channel?.isTextBased() ? await channel.messages.fetch(messageId!).catch(() => null) : null;
+		if (!messageId) {
+			await um.reply("That's not a message id or link");
+			return null;
+		}
+		if (guildId && guildId !== um.guild.id) {
+			await um.reply("That message is from another server");
+			return null;
+		}
+
+		const post = SBM.getByPost(messageId);
+		const channel = await ResolvedChannel.from(post?.channel ?? channelId ?? um.channel).resolve();
+		const raw = channel.channel?.isTextBased() ? await channel.channel.messages.fetch(post?.message ?? messageId).catch(() => null) : null;
+
+		if (!raw) {
+			await um.reply("Couldn't find that message");
+			return null;
+		}
+		return ResolvedMessage.from(raw);
 	}
 
 	public async entryGetAll(iom: IOM, args?: Args) {
