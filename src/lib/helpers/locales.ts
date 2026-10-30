@@ -1,35 +1,51 @@
+import { BaseChannel, Guild } from "discord.js";
 import { Liquid } from "liquidjs";
-import { DBLocales, PerGuildDBLocales } from "../db/db_locales";
-import { LOCALES, PER_GUILD_LOCALES } from "../db/db_schema";
 import { readFileSync } from "fs";
-import { srcDir } from "../constants";
 import { join } from "path";
+import { srcDir } from "../constants";
+import { randomFrom } from "../utils";
+import { DBLocales } from "../db/db_locales";
+import { LOCALES, type DBLocale } from "../db/db_schema";
+import { Scope } from "../db/db_enum";
+import { ResolvedChannel } from "./channels";
+import { ResolvedGuild } from "./guilds";
 
 class BotDBLocalesCollection {
-    public G: DBLocales;
-    public PG: PerGuildDBLocales;
-    private engine: Liquid;
+	public L: DBLocales;
+	private engine: Liquid;
 
-    public constructor(locales: typeof LOCALES, per_guild_locales: typeof PER_GUILD_LOCALES, default_path?: string) {
-        this.G = new DBLocales(locales);
-        if (default_path) this.G.sync(JSON.parse(readFileSync(default_path, "utf-8")));
-        this.G.sync(undefined, false)
-        this.PG = new PerGuildDBLocales(per_guild_locales).sync();
-        this.engine = new Liquid();
+	public constructor(locales: typeof LOCALES, default_path?: string) {
+		this.L = new DBLocales(locales);
 
-        this.engine.registerFilter("random", (input) => {
-            const parts = String(input).split("|");
-            return parts[Math.floor(Math.random() * parts.length)];
-        });
-    }
+		if (default_path) {
+			const defaults: Record<string, string> = JSON.parse(readFileSync(default_path, "utf-8"));
+			const rows: DBLocale[] = Object.entries(defaults).map(([key, value]) => ({scope: Scope.GLOBAL, scope_id: "", key, value}));
+			this.L.sync(rows);
+		}
+		this.L.sync(undefined, false);
 
-    public async getFormatted(key: string, args: Record<string, string> = {}, guild?: string, def?: any): Promise<string> {
-        let loc = "";
-        if (guild !== undefined) loc = this.PG.find(guild, key) ?? this.G.get(key, def);
-        else loc = this.G.get(key, def)
+		this.engine = new Liquid();
+		this.engine.registerFilter("random", (value) => randomFrom(String(value).split("|")));
+	}
 
-        return await this.engine.parseAndRender(String(loc), args);
-    }
+	// getters
+	public async getFormatted(key: string, args: Record<string, string> = {}, scope: Scope = Scope.GLOBAL, scope_id: string = "", def?: any): Promise<string> {
+		const loc = this.L.find(key, scope, scope_id)?.value ?? this.L.get(key, Scope.GLOBAL, "", def);
+		return await this.engine.parseAndRender(String(loc), args);
+	}
+
+	public async getFormattedFrom(key: string, args: Record<string, string> = {}, target?: Guild | ResolvedGuild | BaseChannel | ResolvedChannel | null, def?: any): Promise<string> {
+		if (target instanceof Guild || target instanceof ResolvedGuild) return this.getFormatted(key, args, Scope.GUILD, target.id, def);
+		if (target instanceof BaseChannel || target instanceof ResolvedChannel) return this.getFormatted(key, args, Scope.CHANNEL, target.id, def);
+		return this.getFormatted(key, args, undefined, undefined, def)
+	}
+
+	public async get(key: string, args: Record<string, string> = {}, scope: Scope = Scope.GLOBAL, scope_id: string = "", def?: any): Promise<string> {
+		return this.getFormatted(key, args, scope, scope_id, def)
+	}
+
+	// setters
+	// TODO
 }
 
-export const LOC = new BotDBLocalesCollection(LOCALES, PER_GUILD_LOCALES, join(srcDir, "default_locales.json"))
+export const LOC = new BotDBLocalesCollection(LOCALES, join(srcDir, "default_locales.json"));

@@ -1,71 +1,57 @@
-import { UserError } from "@sapphire/framework";
-import { DBUser, USERS } from "./db_schema"
+import { and, eq } from "drizzle-orm";
+import { DBUser, NewDBUser, USERS } from "./db_schema";
+import { DBBase } from "./db_classes";
 import { db } from "./db";
-
-export class DBUsersInitError extends UserError {
-    public constructor() {
-        super({
-            identifier: "DBUsersInitError",
-            message: `DBUsers arent initialized properly`,
-            context: {},
-        });
-    }
-}
+import { Scope } from "./db_enum";
 
 export type NotNullDBUser = {[K in keyof DBUser]: NonNullable<DBUser[K]>};
 
-export class DBUsers {
-    private users: Record<string, NotNullDBUser> = {};
-    private table: typeof USERS | undefined;
+type Data = Partial<Omit<NewDBUser, "scope" | "scope_id" | "id">>;
 
-    public constructor(table?: typeof USERS) {
-        this.table = table;
-    }
+export class DBUsers extends DBBase<typeof USERS, DBUser, DBUser, Record<Scope, Record<string, Record<string, DBUser>>>> {
+	public default(id: string = "", scope: Scope = Scope.GLOBAL, scope_id: string = ""): NotNullDBUser {
+		return {
+			scope,
+			scope_id,
+			id,
+			perm: 1,
+			title: "{name}",
+			limited: false,
+			quiet: false
+		};
+	}
 
-    public sync(source: Record<string, DBUser> | null = null, clear: boolean = true) {
-        if (clear) this.users = {};
-        if (source == null) {
-            if (this.table == null) throw new DBUsersInitError();
-            db.select().from(this.table).all().forEach((row) => this.users[row.id] = DBUsers.normalize(row));
-        }
-        else Object.entries(source).forEach(([id, user]) => this.users[id] = DBUsers.normalize(user));
-        return this;
-    }
+	protected override load(table: typeof USERS) {
+		return db.select().from(table).all();
+	}
 
-    public static default(id: string): NotNullDBUser {
-        return {
-            id,
-            perm: 1,
-            title: "{name}",
-            limited: false,
-            quiet: false,
-        }
-    }
+	protected override store(row: DBUser) {
+		return ((this.cache[row.scope] ??= {})[row.scope_id] ??= {})[row.id] = row;
+	}
 
-    public static normalize(row: DBUser): NotNullDBUser {
-        const def = DBUsers.default(row.id);
-        return {
-            id: row.id,
-            perm: row.perm ?? def.perm,
-            title: row.title ?? def.title,
-            limited: row.limited ?? def.limited,
-            quiet: row.quiet ?? def.quiet,
-        }
-    }
+	protected override upsert(id: string, scope: Scope, scope_id: string, data: Data) {
+		const table = this.ready;
+		return db.insert(table).values({scope, scope_id, id, ...data}).onConflictDoUpdate({target: [table.scope, table.scope_id, table.id], set: data}).returning().get();
+	}
 
-    public get(id: string): DBUser | undefined {
-        return this.users[id];
-    }
+	public find(id: string, scope: Scope = Scope.GLOBAL, scope_id: string = ""): DBUser | undefined {
+		return this.cache[scope]?.[scope_id]?.[id];
+	}
 
-    public getOrDefault(id: string): NotNullDBUser {
-        const row = this.get(id);
-        return row === undefined ? DBUsers.default(id) : DBUsers.normalize(row);
-    }
+	public override get(id: string, scope: Scope = Scope.GLOBAL, scope_id: string = ""): NotNullDBUser {
+		const rows = [this.find(id, Scope.GLOBAL, ""), scope === Scope.GLOBAL ? undefined : this.find(id, scope, scope_id)];
+		const set = Object.assign({}, ...rows.map((value) => Object.fromEntries(Object.entries(value ?? {}).filter(([_key, value]) => value != null))));
+		return {...this.default(id, scope, scope_id), ...set, scope, scope_id, id};
+	}
 
-    public update(id: string, data: Partial<Omit<DBUser, "id">> = {}) {
-        if (this.table == null) throw new DBUsersInitError();
-        if (Object.keys(data).length === 0) return;
-        const row = db.insert(this.table).values({...DBUsers.default(id), ...data}).onConflictDoUpdate({target: this.table.id, set: data}).returning().get();
-        this.users[id] = DBUsers.normalize(row);
-    }
+	public update(id: string, data: Data = {}, scope: Scope = Scope.GLOBAL, scope_id: string = "") {
+		if (Object.keys(data).length === 0) return;
+		this.store(this.upsert(id, scope, scope_id, data));
+	}
+
+	public delete(id: string, scope: Scope = Scope.GLOBAL, scope_id: string = "") {
+		const table = this.ready;
+		db.delete(table).where(and(eq(table.scope, scope), eq(table.scope_id, scope_id), eq(table.id, id))).run();
+		delete this.cache[scope]?.[scope_id]?.[id];
+	}
 }

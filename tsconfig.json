@@ -6,8 +6,11 @@
 		"tsBuildInfoFile": "dist/.tsbuildinfo",
 		"declaration": false,
 		"declarationMap": false,
-    	"esModuleInterop": true,
-		"skipLibCheck": true
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"paths": {
+			"@sillybit/colorhacks": ["./node_modules/@sillybit/colorhacks/dist/index.d.cts"],
+		}
 	},
-  	"include": ["src/**/*"]
+	"include": ["src/**/*"]
 }

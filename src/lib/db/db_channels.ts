@@ -1,69 +1,35 @@
-import { UserError } from "@sapphire/framework";
-import { DBChannel, CHANNELS } from "./db_schema"
+import { DBChannel, NewDBChannel, CHANNELS } from "./db_schema";
+import { NotNullDBBase } from "./db_classes";
 import { db } from "./db";
-
-export class DBChannelsInitError extends UserError {
-    public constructor() {
-        super({
-            identifier: "DBChannelsInitError",
-            message: `DBChannels arent initialized properly`,
-            context: {},
-        });
-    }
-}
 
 export type NotNullDBChannel = {[K in keyof DBChannel]: NonNullable<DBChannel[K]>};
 
-export class DBChannels {
-    private guilds: Record<string, NotNullDBChannel> = {};
-    private table: typeof CHANNELS | undefined;
+type Data = Partial<Omit<NewDBChannel, "id">>;
 
-    public constructor(table?: typeof CHANNELS) {
-        this.table = table;
-    }
+export class DBChannels extends NotNullDBBase<typeof CHANNELS, DBChannel, NewDBChannel> {
+	public override default(id: string = ""): NotNullDBChannel {
+		return {
+			id,
+			limited: false,
+			quiet: false
+		};
+	}
 
-    public sync(source: Record<string, DBChannel> | null = null, clear: boolean = true) {
-        if (clear) this.guilds = {};
-        if (source == null) {
-            if (this.table == null) throw new DBChannelsInitError();
-            db.select().from(this.table).all().forEach((row) => this.guilds[row.id] = DBChannels.normalize(row));
-        }
-        else Object.entries(source).forEach(([id, guild]) => this.guilds[id] = DBChannels.normalize(guild));
-        return this;
-    }
+	public override normalize(row: DBChannel): NotNullDBChannel {
+		const def = this.default(row.id);
+		return {
+			id: row.id,
+			limited: row.limited ?? def.limited,
+			quiet: row.quiet ?? def.quiet
+		};
+	}
 
-    public static default(id: string = ""): NotNullDBChannel {
-        return {
-            id,
-            limited: false,
-            quiet: false,
-            prefix: "^"
-        }
-    }
+	protected override load(table: typeof CHANNELS) {
+		return db.select().from(table).all();
+	}
 
-    public static normalize(row: DBChannel): NotNullDBChannel {
-        const def = DBChannels.default(row.id);
-        return {
-            id: row.id,
-            limited: row.limited ?? def.limited,
-            quiet: row.quiet ?? def.quiet,
-            prefix: row.prefix ?? def.prefix
-        }
-    }
-
-    public get(id: string): DBChannel | undefined {
-        return this.guilds[id];
-    }
-
-    public getOrDefault(id: string): NotNullDBChannel {
-        const row = this.get(id);
-        return row === undefined ? DBChannels.default(id) : DBChannels.normalize(row);
-    }
-
-    public update(id: string, data: Partial<Omit<DBChannel, "id">> = {}) {
-        if (this.table == null) throw new DBChannelsInitError();
-        if (Object.keys(data).length === 0) return;
-        const row = db.insert(this.table).values({...DBChannels.default(id), ...data}).onConflictDoUpdate({target: this.table.id, set: data}).returning().get();
-        this.guilds[id] = DBChannels.normalize(row);
-    }
+	protected override upsert(id: string, data: Data) {
+		const table = this.ready;
+		return db.insert(table).values({...this.default(id), ...data}).onConflictDoUpdate({target: table.id, set: data}).returning().get();
+	}
 }

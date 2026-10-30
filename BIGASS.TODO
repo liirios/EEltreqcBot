@@ -1,4 +1,14 @@
-starboard
 experience
-maybe consumables
-port other stuff
+currency
+maybe consumables & shop
+autorole?
+reaction roles?
+role & nickname restoration on rejoin?
+verification stuff?
+messages on events like member leave, or join, or boost, or ban, or any other event? aka logging?
+custom embed builder for users? (this is gonna be hell)
+port other stuff like locales
+port damn FAQS already you lazy
+make error helper idk
+activity builder helper somewhere idk
+bring db schema to single style and sort it out

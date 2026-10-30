@@ -1,21 +1,16 @@
 import { UserError } from "@sapphire/framework";
-import { USR } from "./helpers/users";
+import { ResolvedUser, type ResolvableUser } from "./helpers/users";
+import { Scope } from "./db/db_enum";
 
 export class PermError extends UserError {
-    public constructor(public readonly required: number, public readonly got: number) {
-        super({
-            identifier: "PermError",
-            message: `You need perm^${required} (you got perm^${got})`,
-            context: {},
-        });
-    }
+	public constructor(public readonly required: number, public readonly got: number, public readonly user?: ResolvableUser, authorId?: string, scope?: typeof Scope[keyof typeof Scope]) {
+		const id = ResolvedUser.from(user).id;
+		super({
+			identifier: "PermError",
+			message: `${id && id !== authorId ? `${ResolvedUser.mention(id)}` : "You"} need perm^${required}${scope === Scope.CHANNEL ? " in this channel" : scope === Scope.GUILD ? " in this guild" : ""} (${id && id !== authorId ? "they" : "you"} got perm^${got})`,
+			context: {},
+		});
+	}
 }
 
-export function requirePerm(id: string, required: number) {
-    const perm = USR.getOrDefault(id).perm;
-    if (perm < required) throw new PermError(required, perm);
-}
-
-export const prePerm = (required: number) => ({ name: "Perm" as const, context: { required } });
-
-
+export const prePerm = (required: number, scope?: typeof Scope[keyof typeof Scope]) => ({name: "Perm" as const, context: {required, scope}});

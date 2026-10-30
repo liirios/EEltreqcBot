@@ -1,55 +1,60 @@
 {
-  "name": "EEltreqcBot",
-  "version": "2.0.0",
-  "main": "dist/index.js",
-  "author": "Liirios",
-  "license": "MIT",
-  "type": "commonjs",
-  "dependencies": {
-    "@sapphire/decorators": "^6.2.0",
-    "@sapphire/discord.js-utilities": "7.3.3",
-    "@sapphire/framework": "^5.5.1",
-    "@sapphire/plugin-editable-commands": "^4.0.4",
-    "@sapphire/plugin-logger": "^4.1.0",
-    "@sapphire/plugin-subcommands": "^7.0.1",
-    "@sapphire/utilities": "^3.18.2",
-    "@skyra/env-utilities": "^2.0.1",
-    "better-sqlite3": "^13.0.3",
-    "colorette": "^2.0.20",
-    "discord.js": "^14.27.0",
-    "drizzle-orm": "^0.45.4",
-    "liquidjs": "^10.30.0",
-    "pet-pet-gif": "^1.0.9"
-  },
-  "devDependencies": {
-    "@sapphire/cli": "^1.9.3",
-    "@sapphire/prettier-config": "^2.0.0",
-    "@sapphire/ts-config": "^5.0.3",
-    "@types/better-sqlite3": "^9.6.0",
-    "@types/node": "^22.20.1",
-    "@types/ws": "^8.18.1",
-    "drizzle-kit": "^0.31.11",
-    "prettier": "^3.9.6",
-    "tsc-watch": "^6.3.1",
-    "typescript": "~5.4.5"
-  },
-  "scripts": {
-    "sapphire": "sapphire",
-    "generate": "sapphire generate",
-    "build": "tsc",
-    "watch": "tsc -w",
-    "start": "node dist/index.js",
-    "dev": "npm run build && npm run start",
-    "watch:start": "tsc-watch --onSuccess \"npm run start\"",
-    "format": "prettier --write \"src/\"",
-    "dbpush": "drizzle-kit push --config=src/drizzle.config.ts"
-  },
-  "overrides": {
-    "canvas": "^3.1.0"
-  },
-  "prettier": "@sapphire/prettier-config",
-  "allowScripts": {
-    "better-sqlite3@13.0.3": true,
-    "canvas@3.2.3": true
-  }
+	"name": "EEltreqcBot",
+	"version": "2.0.0",
+	"main": "dist/index.js",
+	"author": "Liirios",
+	"license": "MIT",
+	"type": "commonjs",
+	"dependencies": {
+		"@napi-rs/canvas": "^1.0.13",
+		"@sapphire/decorators": "^6.2.0",
+		"@sapphire/discord.js-utilities": "7.3.3",
+		"@sapphire/framework": "^5.5.1",
+		"@sapphire/plugin-editable-commands": "^4.0.4",
+		"@sapphire/plugin-logger": "^4.1.0",
+		"@sapphire/plugin-subcommands": "^7.0.1",
+		"@sapphire/utilities": "^3.18.2",
+		"@skyra/env-utilities": "^2.0.1",
+		"better-sqlite3": "^13.0.3",
+		"chroma-js": "^3.2.0",
+		"color-name-list": "^10.25.1",
+		"colorette": "^2.0.20",
+		"discord.js": "^14.27.0",
+		"drizzle-orm": "^0.45.4",
+		"fuse.js": "^7.5.0",
+		"liquidjs": "^10.30.0",
+		"pet-pet-gif": "^1.0.9"
+	},
+	"devDependencies": {
+		"@sapphire/cli": "^1.9.3",
+		"@sapphire/prettier-config": "^2.0.0",
+		"@sapphire/ts-config": "^5.0.3",
+		"@types/better-sqlite3": "^9.6.0",
+		"@types/chroma-js": "^3.1.3",
+		"@types/node": "^22.20.1",
+		"@types/ws": "^8.18.1",
+		"drizzle-kit": "^0.31.11",
+		"prettier": "^3.9.6",
+		"tsc-watch": "^6.3.1",
+		"typescript": "~5.4.5"
+	},
+	"scripts": {
+		"sapphire": "sapphire",
+		"generate": "sapphire generate",
+		"build": "tsc",
+		"watch": "tsc -w",
+		"start": "node dist/index.js",
+		"dev": "npm run build && npm run start",
+		"watch:start": "tsc-watch --onSuccess \"npm run start\"",
+		"format": "prettier --write \"src/\"",
+		"dbpush": "drizzle-kit push --config=src/drizzle.config.ts"
+	},
+	"overrides": {
+		"canvas": "^3.1.0"
+	},
+	"prettier": "@sapphire/prettier-config",
+	"allowScripts": {
+		"better-sqlite3@13.0.3": true,
+		"canvas@3.2.3": true
+	}
 }

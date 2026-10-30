@@ -14,7 +14,8 @@ node_modules/
 dist/
 
 # Ignore the config file (contains sensitive information such as tokens)
-config.ts
+# just use .env for sensitive information???
+# config.ts
 
 # Ignore heapsnapshot and log files
 *.heapsnapshot
@@ -31,3 +32,4 @@ db.db*
 
 # 
 ghi_*/
+ghi_*

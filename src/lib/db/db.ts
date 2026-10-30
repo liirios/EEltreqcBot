@@ -5,5 +5,3 @@ const sqlite = new Database("./db/db.db");
 sqlite.pragma("journal_mode = WAL");
 
 export const db: BetterSQLite3Database = drizzle(sqlite);
-
-export * from "./db_schema";
